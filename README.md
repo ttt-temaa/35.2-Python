@@ -1,7 +1,7 @@
 # DRF Project
 
 ## Описание проекта
-Проект представляет собой веб-приложение на Django REST Framework с настройкой CI/CD и автоматическим деплоем.
+Проект представляет собой веб-приложение на Django REST Framework с настройкой CI/CD и автоматическим деплоем. Проект использует Poetry для управления зависимостями и Docker для контейнеризации.
 
 ## Технологии
 - Python 3.10
@@ -13,37 +13,28 @@
 - Gunicorn
 - Docker
 - GitHub Actions
+- Poetry
 
 ## Локальная разработка
 
 ### Предварительные требования
 - Python 3.10
-- Poetry (для управления зависимостями)
+- Poetry
 - Docker и Docker Compose (опционально)
 
 ### Установка и запуск
 
-1. Клонируйте репозиторий:
+1. Активируйте виртуальное окружение:
 ```bash
-git clone <repository-url>
-cd <project-directory>
+poetry shell
 ```
 
-2. Создайте и активируйте виртуальное окружение:
-```bash
-python -m venv .venv
-source .venv/bin/activate  # для Linux/Mac
-.venv\Scripts\activate     # для Windows
-```
-
-3. Установите зависимости:
+2. Установите зависимости:
 ```bash
 poetry install
-# или
-pip install -r requirements.txt
 ```
 
-4. Создайте файл .env в корневой директории проекта:
+3. Создайте файл .env в корневой директории проекта:
 ```env
 SECRET_KEY=your-secret-key
 POSTGRES_DB=your-db-name
@@ -53,12 +44,12 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 ```
 
-5. Примените миграции:
+4. Примените миграции:
 ```bash
 python manage.py migrate
 ```
 
-6. Запустите сервер разработки:
+5. Запустите сервер разработки:
 ```bash
 python manage.py runserver
 ```
@@ -203,6 +194,45 @@ sudo certbot --nginx -d your_domain.com
 - Логи Gunicorn: `/var/log/gunicorn/`
 - Логи приложения: `/path/to/your/project/logs/`
 
+## Структура проекта
+```
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── users/
+├── materials/
+├── docker-compose.yaml
+├── Dockerfile
+├── poetry.lock
+├── pyproject.toml
+├── requirements.txt
+├── manage.py
+└── .flake8
+```
+
 ## Поддержка
 
 При возникновении проблем создайте issue в репозитории проекта. 
+
+deploy:
+  needs: test
+  runs-on: ubuntu-latest
+  steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /path/to/your/project
+          git pull
+          poetry install
+          python manage.py migrate
+          sudo systemctl restart gunicorn 
