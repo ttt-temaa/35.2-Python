@@ -1,0 +1,5 @@
+venv/
+DjangoProject/.idea/
+__pycache__/
+.env
+*.pyc
