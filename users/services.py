@@ -32,4 +32,3 @@ def create_stripe_session(price):
         mode="payment",
     )
     return session.id, session.url
-
