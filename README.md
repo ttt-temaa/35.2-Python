@@ -219,20 +219,3 @@ sudo certbot --nginx -d your_domain.com
 ## Поддержка
 
 При возникновении проблем создайте issue в репозитории проекта. 
-
-deploy:
-  needs: test
-  runs-on: ubuntu-latest
-  steps:
-    - name: Deploy to server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /path/to/your/project
-          git pull
-          poetry install
-          python manage.py migrate
-          sudo systemctl restart gunicorn 
